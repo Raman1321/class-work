@@ -1,0 +1,82 @@
+history = []
+forward_stack = []
+counts = {}  # page -> number of times visited
+
+def visit_page(page):
+    history.append(page)           # Push page onto history stack
+    forward_stack.clear()          # Clear forward stack on new visit
+    counts[page] = counts.get(page, 0) + 1
+    print(f"Visited: {page} (visited {counts[page]} time{'s' if counts[page] != 1 else ''})")
+
+def go_back():
+    if len(history) <= 1:
+        print("No pages to go back to.")
+        return
+    last_page = history.pop()      # Pop last visited page
+    forward_stack.append(last_page)  # Push it onto forward stack
+    print(f"Going back from: {last_page}")
+    print(f"Current page: {history[-1]}")
+
+def go_forward():
+    if not forward_stack:
+        print("No pages to go forward to.")
+        return
+    next_page = forward_stack.pop()  # Pop from forward stack
+    history.append(next_page)         # Push onto history stack
+    # Note: count will not work in forward,
+    print(f"Going forward to: {next_page}")
+
+def show_history():
+    if not history:
+        print("History is empty.")
+    else:
+        # Show history with visit counts (total visits for each page)
+        history_str = " -> ".join(f"{p}({counts.get(p,0)})" for p in history)
+        print("History (back stack):", history_str)
+
+    if forward_stack:
+        forward_str = " -> ".join(f"{p}({counts.get(p,0)})" for p in forward_stack)
+        print("Forward stack:", forward_str)
+    else:
+        print("Forward stack is empty.")
+
+    # Also print a summary of total visits per page
+    if counts:
+        print("\nVisit counts summary:")
+        for page, c in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
+            print(f"  {page}: {c} time{'s' if c != 1 else ''}")
+
+# ---------------- Menu ----------------
+def main():
+    try:
+        while True:
+            print("\n1. Visit Page")
+            print("2. back")
+            print("3. forward")
+            print("4. Show History")
+            print("5. Exit")
+
+            choice = input("Enter choice: ").strip()
+
+            if choice == "1":
+                page = input("Enter page name: ").strip()
+                if page:
+                    visit_page(page)
+                else:
+                    print("Page name cannot be empty.")
+            elif choice == "2":
+                go_back()
+            elif choice == "3":
+                go_forward()
+            elif choice == "4":
+                show_history()
+            elif choice == "5":
+                print("Exiting browser simulation.")
+                break
+            else:
+                print("Invalid choice.")
+    except KeyboardInterrupt:
+        print("\nExiting (keyboard interrupt).")
+
+if __name__ == "__main__":
+    main()
